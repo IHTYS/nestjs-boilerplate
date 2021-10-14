@@ -18,6 +18,10 @@ export const typeOrmConfig: TypeOrmModuleAsyncOptions = {
             )
         }
 
+        if (configService.get(`NODE_ENV`) === `development-no-migration`) {
+            console.log(`Development mode without migrations`)
+        }
+
         return {
             type: 'postgres',
             entities: [`${__dirname}/../**/*.entity{.ts,.js}`],
@@ -26,7 +30,10 @@ export const typeOrmConfig: TypeOrmModuleAsyncOptions = {
             port: configService.get('PSQL_PORT') || DEFAULT_PSQL_PORT,
             username: configService.get('PSQL_USERNAME'),
             password: configService.get('PSQL_PASSWORD'),
-            synchronize: false,
+            // synchronize: false,
+            synchronize: configService.get(`NODE_ENV`) === `development-no-migration`,
+            dropSchema:
+                configService.get(`NODE_ENV`) === `development-no-migration` && configService.get(`DROP_DATABASE`),
         }
     },
     inject: [ConfigService],
